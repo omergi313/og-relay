@@ -32,7 +32,7 @@ class PipelineTest(unittest.TestCase):
         ok = [sys.executable, '-c', 'print("ok")']
         relay.save(relay.common(self.root) / 'config.json', {'version': 1, 'max_parallel': 1,
                    'smoke': {'restart': ok, 'health': ok},
-                   'live': {k: ok for k in ('stop', 'backup', 'start', 'health')}})
+                   'live': {k: ok for k in ('isolation_check', 'stop', 'backup', 'start', 'health')}})
         self.report = Path(self.temp.name) / 'report.json'
         relay.save(self.report, {'deviations': 'none', 'decisions': 'none', 'issues': 'none'})
 
@@ -171,6 +171,12 @@ class PipelineTest(unittest.TestCase):
         self.verified(); self.cli('ready', 'toy', ok=False)
         self.cli('resolve', 'toy', 'approval', '--confirmed', '--evidence', 'Approved candidate')
         self.cli('ready', 'toy')
+
+    def test_live_on_source_blocks_merge(self):
+        self.verified()
+        s = self.state(); s['config']['live']['isolation_check'] = [sys.executable, '-c', 'raise SystemExit(1)']; relay.persist(self.root, s)
+        self.cli('finish', 'toy', '--confirmed', ok=False)
+        self.assertNotIn('merge_sha', self.state())
 
     def test_unrelated_task_hook_passes(self):
         hook = Path(__file__).resolve().parents[1] / 'scripts/stage_gate.py'

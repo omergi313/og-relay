@@ -21,7 +21,7 @@ Agents must read the error, not infer success from a log file existing.
 | `accept SLUG --confirmed --evidence TEXT` | Record actual user smoke acceptance for current SHA. |
 | `resolve SLUG ACTION --confirmed --evidence TEXT` | Record an actual prerequisite, release or post-release action. |
 | `reconcile SLUG` | Merge advanced base into feature and invalidate downstream evidence. No history rewriting. |
-| `ready SLUG` | Enforce all merge requirements without merging. |
+| `ready SLUG` | Enforce all merge requirements and the live isolation callback without merging. |
 | `finish SLUG --confirmed` | Merge --no-ff after all gates; retain state; never restart live. |
 | `deploy SLUG --confirmed` | Create pinned release, run stop/backup/start/health, retain every command result. |
 | `close SLUG` | Mark released after live health and all action requirements; retain records. |

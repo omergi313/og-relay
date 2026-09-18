@@ -106,12 +106,19 @@ def link_external(target, source):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['smoke-restart', 'smoke-health', 'live-stop', 'live-backup', 'live-start', 'live-health'])
+    parser.add_argument('action', choices=['isolation-check', 'smoke-restart', 'smoke-health', 'live-stop', 'live-backup', 'live-start', 'live-health'])
     args = parser.parse_args()
     source = Path(os.environ['RELAY_SOURCE_DIR']).resolve()
     work = Path(os.environ['RELAY_WORKTREE']).resolve()
     runtime = relay.common(source) / 'money-runtime'; runtime.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
+    if args.action == 'isolation-check':
+        for pid in listeners(8765):
+            cwd = cwd_of(pid)
+            relay.require(cwd is not None and cwd not in (source, work),
+                          'Live still serves a development checkout. Approve scripts/bootstrap_money.py PROJECT --confirmed, or stop legacy live before merging.')
+        print('Live does not serve source or feature files.')
+        return
     if args.action.startswith('smoke-'):
         relay.require(not (work / '.data').is_symlink() and not (work / '.env').exists(), 'Smoke must not link live data or load .env.')
         sha = relay.head(work)

@@ -172,7 +172,7 @@ def config(root):
         require(isinstance(c.get(kind), dict), f'Config needs {kind}.')
     for k in ('restart', 'health'):
         command_ok(c['smoke'].get(k))
-    for k in ('stop', 'backup', 'start', 'health'):
+    for k in ('isolation_check', 'stop', 'backup', 'start', 'health'):
         command_ok(c['live'].get(k))
     return c
 
@@ -506,6 +506,10 @@ def ready(s):
             if a['phase'] == 'release':
                 require(s['actions'].get(a['id'], {}).get('sha') == head(w), f'Release action {a["id"]} missing/stale.')
     source = Path(s['source'])
+    isolation = execute(source, s, s['config']['live']['isolation_check'], 'live-isolation', cwd=source)
+    require(isolation['exit_code'] == 0, f'Live isolation check failed; see {isolation["log"]}. Stop or cut over a legacy server before merging.')
+    for kind in ('check', 'review', 'smoke', 'acceptance'):
+        check_evidence(s, kind)
     require(git(source, 'rev-parse', s['base_branch']) == s['base_sha'], 'Base branch moved. Reconcile it and validate a new candidate; merge is blocked.')
 
 

@@ -21,6 +21,7 @@ if __name__ == '__main__':
          'smoke': {'restart': [sys.executable, runtime, 'smoke-restart'],
                    'health': [sys.executable, runtime, 'smoke-health'], 'url': 'http://127.0.0.1:8878'},
          'live': {name: [sys.executable, runtime, 'live-' + name] for name in ('stop', 'backup', 'start', 'health')}}
+    c['live']['isolation_check'] = [sys.executable, runtime, 'isolation-check']
     if target.exists():
         relay.save(target.with_name('config.backup-' + str(__import__('time').time_ns()) + '.json'), relay.load(target))
     relay.save(target, c)

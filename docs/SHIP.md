@@ -48,6 +48,7 @@ requires evidence; prefer a fresh diagnostic worker for large investigations. Ne
 ## Finish and live deployment
 
 1. `R ready <slug>` checks all stages, current integration/review/smoke/acceptance, release actions and base SHA.
+   If the live isolation check finds a legacy process serving source, stop before merging. For Money, show and request authorization for the one-time `python3 <RELAY_ROOT>/scripts/bootstrap_money.py <project> --confirmed` cutover of the current base. This is a live restart with a backup, not a feature deployment. Honor prior explicit authorization if already given. After it succeeds, rerun ready.
    If the base moved, `R reconcile <slug>` merges the new base into the feature without rewriting its stage history.
    Resolve conflicts through a bounded worker; rerun all candidate verification and acceptance. Never force the base.
 2. Present the candidate, review result and merge target. Honor explicit approval already given for that candidate;

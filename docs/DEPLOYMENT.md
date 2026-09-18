@@ -16,7 +16,7 @@ fixtures separate from persistent data. Never share mutable generated code or a 
 
 Commands are trusted project configuration, not commands derived from user-facing app input. `smoke.restart` and
 `smoke.health` run in feature; `live.stop`, `live.backup`, `live.start`, `live.health` run in the pinned release.
-All are argv arrays. Environment variables give absolute source/worktree/release/run paths and the expected SHA.
+`live.isolation_check` runs read-only from source before merge and must reject live processes using the source or feature checkout. All are argv arrays. Environment variables give absolute source/worktree/release/run paths and the expected SHA.
 
 Every callback must exit nonzero on failure. Health should check process ownership, expected version and an app
 endpoint. A port responding alone is insufficient. The engine logs stdout/stderr and exit codes. Callbacks must
@@ -42,8 +42,7 @@ The run state retains each attempt, even when a later deployment succeeds.
 5. Verifies the listener PID, process cwd, pinned Git SHA, clean source, and HTTP response before reporting healthy.
 
 The integration assumes the existing gateway/data layout and local app ports. It does not start or reconfigure
-the gateway. Updating workflows alone does not cut over an already-running live process; that happens at the next
-explicitly approved deployment. Until then, leave the legacy source checkout's implementation files untouched.
+the gateway. Updating workflows alone does not cut over an already-running live process. The merge guard blocks while it serves the source checkout. With explicit live restart approval, run `python3 scripts/bootstrap_money.py /path/to/money --confirmed` to deploy the current base into a pinned release first. Its backup and command journal live under `<git-common-dir>/og-relay/bootstrap/<sha>/`. It leaves source code and feature state unchanged. Until cutover, leave the legacy source checkout's implementation files untouched.
 
 ## Rollback
 

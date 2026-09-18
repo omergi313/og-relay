@@ -66,7 +66,7 @@ Config can instead live privately at `<git-common-dir>/og-relay/config.json`; tr
 
 Smoke callbacks run in the feature checkout. Live callbacks run in a new **detached worktree at the merge commit**.
 They receive `RELAY_SOURCE_DIR`, `RELAY_WORKTREE`, `RELAY_RELEASE_DIR`, `RELAY_RUN_DIR`, and `RELAY_SHA`.
-Provide idempotent `stop`, `backup`, `start`, and `health` commands. Health must identify the expected process/version,
+Provide a read-only `isolation_check` that rejects live processes serving the source/feature checkout, plus idempotent `stop`, `backup`, `start`, and `health` commands. Health must identify the expected process/version,
 not merely any listener on a port. Backups must print their locations into the retained command log. Never update
 files beneath a running live process or point smoke at the persistent live database.
 
@@ -78,9 +78,7 @@ python3 scripts/configure_money.py /path/to/money
 
 This installs private configuration only. It **does not restart live**. The first approved deploy stops the recognized
 old live process, waits for worker shutdown, makes an integrity-checked SQLite backup, and starts from the pinned release. Money's `.data` and
-optional `.env` stay external and are linked only into live releases. Until that first approved cutover, an existing
-legacy live process still serves its old checkout. Never implement new features in that checkout; Relay creates a
-separate one. See [deployment and rollback](docs/DEPLOYMENT.md).
+optional `.env` stay external and are linked only into live releases. An existing legacy live process still serves its old checkout until cutover. The merge guard refuses to update that checkout while live is serving it. After explicit approval, run `python3 scripts/bootstrap_money.py /path/to/money --confirmed` to move the **current base** into a pinned release before the first feature merge. This backs up data and restarts live; configuration/installation alone never does. Never implement new features in the legacy checkout; Relay creates a separate one. See [deployment and rollback](docs/DEPLOYMENT.md).
 
 ## What the gates enforce
 
