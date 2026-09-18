@@ -1,0 +1,4 @@
+interface:
+  display_name: "Relay Ship"
+  short_description: "OG Relay ship workflow for staged features"
+  default_prompt: "Use $relay-ship for this feature."

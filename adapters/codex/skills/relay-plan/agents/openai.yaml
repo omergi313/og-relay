@@ -1,0 +1,4 @@
+interface:
+  display_name: "Relay Plan"
+  short_description: "OG Relay plan workflow for staged features"
+  default_prompt: "Use $relay-plan for this feature."

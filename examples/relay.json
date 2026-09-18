@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "max_parallel": 1,
+  "smoke": {
+    "restart": ["sh", "scripts/serve.sh", "smoke", "restart"],
+    "health": ["sh", "scripts/serve.sh", "smoke", "status"],
+    "url": "http://127.0.0.1:8878"
+  },
+  "live": {
+    "stop": ["sh", "scripts/release.sh", "stop"],
+    "backup": ["sh", "scripts/release.sh", "backup"],
+    "start": ["sh", "scripts/release.sh", "start"],
+    "health": ["sh", "scripts/release.sh", "health"]
+  }
+}

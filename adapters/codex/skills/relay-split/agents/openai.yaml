@@ -1,0 +1,4 @@
+interface:
+  display_name: "Relay Split"
+  short_description: "OG Relay split workflow for staged features"
+  default_prompt: "Use $relay-split for this feature."

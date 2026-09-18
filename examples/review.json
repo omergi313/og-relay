@@ -1,0 +1,6 @@
+{
+  "sha": "REPLACE_WITH_FULL_CANDIDATE_SHA",
+  "reviewer": "fresh reviewer session identifier",
+  "summary": "Reviewed the candidate against SOURCE.md and the hard constraints.",
+  "findings": []
+}

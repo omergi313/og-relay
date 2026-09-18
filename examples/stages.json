@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "slug": "example",
+  "test_command": ["python3", "-m", "unittest", "discover", "-s", "tests"],
+  "check_command": ["make", "check"],
+  "stages": [
+    {
+      "n": 1,
+      "file": "01_feature.md",
+      "title": "Implement the feature",
+      "depends_on": [],
+      "owns": ["package/feature.py", "tests/test_feature.py"],
+      "actions": [
+        {"id": "verify-live", "phase": "post_release", "description": "Verify the feature on live data"}
+      ]
+    }
+  ]
+}
