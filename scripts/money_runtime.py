@@ -110,7 +110,7 @@ def main():
     args = parser.parse_args()
     source = Path(os.environ['RELAY_SOURCE_DIR']).resolve()
     work = Path(os.environ['RELAY_WORKTREE']).resolve()
-    runtime = relay.common(source) / 'money-runtime'; runtime.mkdir(parents=True, exist_ok=True)
+    runtime = relay.common(source) / 'money-runtime'
     env = os.environ.copy()
     if args.action == 'isolation-check':
         for pid in listeners(8765):
@@ -119,6 +119,7 @@ def main():
                           'Live still serves a development checkout. Approve scripts/bootstrap_money.py PROJECT --confirmed, or stop legacy live before merging.')
         print('Live does not serve source or feature files.')
         return
+    runtime.mkdir(parents=True, exist_ok=True)
     if args.action.startswith('smoke-'):
         relay.require(not (work / '.data').is_symlink() and not (work / '.env').exists(), 'Smoke must not link live data or load .env.')
         sha = relay.head(work)
