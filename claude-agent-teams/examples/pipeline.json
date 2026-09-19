@@ -1,0 +1,14 @@
+{
+  "smoke": {
+    "restart": "sh scripts/serve.sh smoke restart",
+    "status": "sh scripts/serve.sh smoke status",
+    "url": "http://127.0.0.1:8878",
+    "notes": "tests.frontend.server: synthetic fixtures, temporary SQLite, no .env, no broker. Fixtures are rebuilt on every restart. Port 8877 stays free for `npm run test:frontend`, which refuses a busy port."
+  },
+  "live": {
+    "restart": "sh scripts/serve.sh live restart",
+    "status": "sh scripts/serve.sh live status",
+    "url": "http://127.0.0.1:8765",
+    "notes": "The personal app on the real .data/portfolio.sqlite3. Pending migrations apply on start behind Store._backup (copy under .data/backups/). The IBKR gateway must be logged in at https://localhost:5001 first."
+  }
+}

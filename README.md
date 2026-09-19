@@ -108,6 +108,7 @@ the host skills require those actions before recording the corresponding attesta
 | `scripts/` | Installer, Claude completion hook, Money runtime adapter |
 | `examples/` | Project config, stage schema examples and report shapes |
 | `tests/` | Isolated Git lifecycle and installer regression tests |
+| `claude-agent-teams/` | The lighter Claude Code variant: shared working tree, agent teams, no engine ([README](claude-agent-teams/README.md)) |
 
 Plans live in `plans/<slug>/`. Operational state/logs live in `<git-common-dir>/og-relay/runs/<slug>/` and are not
 published with source. Keep that directory in local backups if you need recovery after losing the repository.
