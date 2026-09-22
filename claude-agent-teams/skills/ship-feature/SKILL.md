@@ -55,6 +55,7 @@ Loop until no task can make progress:
   Your task subject: "Plan N — <title> [<slug>]". Branch: feature/<slug> (already checked out; do not switch).
   Stages running in parallel with you right now: <plan-NN list, or none>.
   Follow your protocol. Extra pointers for your stage are under "Session N" in plans/<slug>/PROMPTS.md.
+  Use the ponytail skill for the implementation itself, as your protocol says.
   ```
 - Two stages may run together only if `stages.json` gives them disjoint `owns`. If the split got that wrong,
   serialize them; do not edit the plan.

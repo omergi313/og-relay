@@ -40,6 +40,10 @@ cp agents/*.md ~/.claude/agents/
 cp hooks/stage-gate.py ~/.claude/hooks/
 ```
 
+Optional but recommended: install [ponytail](https://github.com/DietrichGebert/ponytail) so the implementers keep
+each stage's diff minimal (`/plugin marketplace add DietrichGebert/ponytail` then `/plugin install ponytail@ponytail`).
+`stage-implementer` invokes it before writing code and falls back to applying its ladder by hand when it is missing.
+
 Merge `examples/settings.hooks.json` into `~/.claude/settings.json`, copy `examples/pipeline.json` to your
 project's `.claude/pipeline.json` and adapt the commands, and start Claude Code with
 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.

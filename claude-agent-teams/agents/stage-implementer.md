@@ -20,22 +20,27 @@ working on other stages in the same working tree at the same time.
    stage cannot be finished without touching another path, message the lead (SendMessage to `team-lead`) with the path
    and the reason and wait for the answer; never edit it on your own.
 5. Run the baseline test command from the README before changing anything and note the count.
-6. Implement the stage exactly as written. Re-read a file immediately before editing it. Never reset, revert, stash,
+6. Invoke the `ponytail` skill (Skill tool, `ponytail:ponytail`) before you write the first line of code, and
+   follow its ladder for every change: reuse what the codebase already has, then the stdlib, then a native platform
+   feature, then an installed dependency, before writing anything new. It never trims validation, error handling,
+   security or accessibility, and it never overrides the stage file: the brief decides *what* ships, ponytail decides
+   *how small* it can be. If the skill is not installed, apply that ladder yourself.
+7. Implement the stage exactly as written. Re-read a file immediately before editing it. Never reset, revert, stash,
    switch branches, rebase, amend, or bulk-format. Do not start any other stage.
-7. Finish green with the README's finish commands. If the full suite fails only in files owned by a stage that is
+8. Finish green with the README's finish commands. If the full suite fails only in files owned by a stage that is
    running in parallel, do not fix them: message that teammate by name (`plan-NN`), say what fails, and record it under
    "Open issues".
-8. Commit only your owned paths, never `git add -A`, never `plans/<slug>/LOG.md`:
+9. Commit only your owned paths, never `git add -A`, never `plans/<slug>/LOG.md`:
    `git add -- <owned paths you changed>` then
    `git commit -m "Plan N — <title> [<slug>]" -- <owned paths you changed>`.
    If git reports `index.lock`, wait a few seconds and retry once. A fix after a refused completion is a new commit
    with the same subject, not an amend.
-9. Append your entry to `plans/<slug>/LOG.md` from the template there: every line filled, `Commit:` = the sha(s),
-   "Decisions the next plan must know" is mandatory. Append only; never edit other entries. Leave LOG.md uncommitted;
-   the lead commits it.
-10. Mark your task completed. A hook checks the LOG entry, the commit, and that the commit stays inside your owned
+10. Append your entry to `plans/<slug>/LOG.md` from the template there: every line filled, `Commit:` = the sha(s),
+    "Decisions the next plan must know" is mandatory. Append only; never edit other entries. Leave LOG.md uncommitted;
+    the lead commits it.
+11. Mark your task completed. A hook checks the LOG entry, the commit, and that the commit stays inside your owned
     paths; if it refuses, fix what it names and try again.
-11. Send the lead one short message: status, suite count, commit sha, anything it must act on. Then stop. Approve the
+12. Send the lead one short message: status, suite count, commit sha, anything it must act on. Then stop. Approve the
     shutdown request when it arrives.
 
 ## If you are blocked
