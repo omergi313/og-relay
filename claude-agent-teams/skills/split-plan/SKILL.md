@@ -12,6 +12,26 @@ Turn one large plan into a directory of stage briefs that separate fresh session
 1. The source plan: a file the user names, a design doc, a HANDOFF.md, or the plan in the current conversation. If it is only in conversation, first write it to a file the README can point at (e.g. `plans/<slug>/SOURCE.md`); stage files must cite a file, not "the discussion".
 2. Existing conventions: read one existing `plans/*/README.md` and `LOG.md` (or `PROGRESS_LOG.md`) in the project if any exist and match their style, table columns and logging rules. Read `AGENTS.md` / `CLAUDE.md` for communication and hard constraints and copy the relevant ones verbatim into the README; do not paraphrase constraints.
 3. Baseline: run the project's test command once and record the count and state. That number goes into the LOG's "Plan 0" entry.
+4. **One research pass, then write from notes.** Read the source plan **once, in full, with one Read call** (never `cat` plus `sed` windows; never reopen it). In one pass, confirm the files, functions and line areas it names (use `grep -n` / `sed -n`, not whole-file reads). Write a short code map to `plans/<slug>/.codemap.md` (path → functions → line numbers → which stage). From then on write the README, the prompts and every brief from the source plan plus that map. Do not reopen source files while writing or checking briefs: the source plan has already been critic-reviewed against the code, and re-verifying per brief is what blows the context budget. Reopen a file only when the plan and the map disagree.
+
+## Two phases
+
+Splitting is done in two phases so that no single context carries both the whole plan and every brief.
+
+**Phase A — outline (the splitter itself).** Inputs 1–4 above, then write, in this order: `stages.json` (the cut is decided here, before any prose), `README.md`, `LOG.md` with its Plan 0 entry, `PROMPTS.md`. Every decision a brief will need (Shared conventions, Owns, dependencies, test file names, error homes) is settled in these files. Do not write any `NN_*.md` in this phase.
+
+**Phase B — briefs (parallel writers).** Group the stages into batches of at most three, grouped by subsystem so one writer sees related stages. For each batch spawn one `stage-brief-writer` agent with the Agent tool, all in one message so they run concurrently, **without a `name`**. Each prompt is exactly:
+
+```
+Slug: <slug>. Write stage briefs <N1>, <N2>[, <N3>] only.
+Read, in this order: plans/<slug>/README.md, plans/<slug>/stages.json, plans/<slug>/.codemap.md,
+then only these sections of plans/<slug>/SOURCE.md: <section headings for these stages>.
+Write plans/<slug>/<NN_name>.md for each of your stages and nothing else.
+```
+
+The section list is the one thing the outline must get right: name the SOURCE headings each stage derives from (the README's stage table carries a "Design" column for this). Writers do not read other briefs, other plan directories, or source code. If the Agent tool is unavailable, write the briefs yourself, one batch at a time, in stage order.
+
+When all writers return, run "After writing" below. A writer that reports a conflict with the README (an Owns path it needs but does not have, a convention missing) is fixed by editing the README or `stages.json`, then re-sent to that writer; never by letting the brief diverge from the table.
 
 ## Where to write
 
@@ -46,11 +66,13 @@ Never put the plans anywhere else and never merge these files. The stages are ex
 
 ### README.md
 
+**Size cap: about 120 lines.** The README is an index, not a second copy of the plan. Anything already in the source plan (design, payload shapes, error cases, decisions D1..Dn) is cited by section heading, never pasted. A README past the cap is duplicating SOURCE.md; cut it.
+
 1. Title and source of truth: the exact file and date the plans derive from. State: "Execute in order, one per fresh session: paste the matching prompt from PROMPTS.md; each session appends its entry to LOG.md."
-2. Stage table: `# | File — deliverable | Estimate | Depends on | Owns`. Add columns the source doc supports (design sections, owner). Below the table, one sentence naming the chains that may run in parallel.
+2. Stage table: `# | File — deliverable | Design | Estimate | Depends on | Owns`. `Design` lists the source plan section headings the stage derives from (this is what Phase B writers read). Add other columns the source doc supports (owner). Below the table, one sentence naming the chains that may run in parallel.
 3. Handoff protocol, numbered: read README → LOG → stage file; verify prerequisites in LOG, stop if missing; run baseline tests; implement only own scope and edit only owned paths (another path is needed → stop and ask); finish green; commit; append one LOG entry; do not start the next stage; how to leave a note for a later stage. The commit step, verbatim: "Commit only the paths you own and changed: `git add -- <paths>` then `git commit -m "Plan N — <title> [<slug>]" -- <paths>`. Never `git add -A`, never commit `LOG.md` (the lead or the user commits it), never amend, reset, stash or switch branches. On `index.lock`, wait and retry once." State that the work happens on branch `feature/<slug>` starting from a clean tree.
 4. Hard constraints: copied from the repo's rules verbatim (language/version, no new deps, security guards, files that must not move, communication style).
-5. Shared conventions and adopted decisions (see above).
+5. Shared conventions and adopted decisions (see above): **only the choices the source plan left open**, one line each, plus a one-line pointer to the source plan's own decisions section. Do not restate decisions the source plan already made.
 
 ### LOG.md
 
@@ -119,7 +141,8 @@ Keep a stage brief to about 25–40 lines. A brief that needs more than that is 
 
 ## After writing
 
-1. Re-read each stage file as a stranger: can it be executed with only README + LOG + this file + the pointers it names? Fix anything that assumes conversation context.
-2. Check that every file named in a stage exists (or is marked "new"), that every file a stage's steps touch is inside its Owns, that dependencies in the table match the prompts' prerequisite checks and `stages.json`, and that no two stages without a dependency path between them share an owned path. Validate the JSON (`python3 -m json.tool plans/<slug>/stages.json`).
-3. Write the Plan 0 LOG entry (status done, baseline suite, files changed = this directory, decisions made while splitting).
-4. Tell the user: the directory path, the stage count with one line each, which stages can run in parallel, and that they start either with `/ship-feature <slug>` in a fresh session at medium effort, or by pasting Session 1 from PROMPTS.md into a fresh session.
+1. Re-read each stage file as a stranger: can it be executed with only README + LOG + this file + the pointers it names? Fix anything that assumes conversation context. Check size: a brief over about 40 lines goes back to its writer with the instruction to cut, or the stage is split in `stages.json` and the README first.
+2. Check that every file named in a stage exists (or is marked "new") with `ls`/`test -e` only, never by reading it; that every file a stage's steps touch is inside its Owns; that dependencies in the table match the prompts' prerequisite checks and `stages.json`; and that no two stages without a dependency path between them share an owned path. Validate the JSON (`python3 -m json.tool plans/<slug>/stages.json`). This step is a consistency check between the files you wrote, not a second code review.
+3. Confirm the Plan 0 LOG entry written in Phase A still matches (status done, baseline suite, files changed = this directory, decisions made while splitting); amend only the decisions line if Phase B added one.
+4. Keep `plans/<slug>/.codemap.md`; it is small and the ship lead may cite it. It is not a stage input and no prompt names it.
+5. Tell the user: the directory path, the stage count with one line each, which stages can run in parallel, and that they start either with `/ship-feature <slug>` in a fresh session at medium effort, or by pasting Session 1 from PROMPTS.md into a fresh session.

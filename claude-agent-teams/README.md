@@ -1,6 +1,6 @@
 # Claude Code agent-teams workflow
 
-The feature pipeline as it runs day to day in Claude Code with agent teams: three skills, three agent roles, one
+The feature pipeline as it runs day to day in Claude Code with agent teams: three skills, four agent roles, one
 hook. Plans are files, every stage runs in a fresh context, one commit per stage on `feature/<slug>`.
 
 This is the lightweight sibling of the `relay.py` engine in the repo root. It uses a shared working tree and
@@ -27,7 +27,7 @@ Claude's experimental agent teams instead of worktrees and a gate CLI. Pick one 
 | `skills/split-feature/` | Critic + split for a plan you already have |
 | `skills/split-plan/` | How stages are cut: small stages, exact owned paths, README/LOG/PROMPTS/stages.json |
 | `skills/ship-feature/` | Team lead protocol; `dryrun.sh` builds a toy repo to rehearse a run |
-| `agents/` | `plan-critic`, `plan-splitter`, `stage-implementer` role definitions |
+| `agents/` | `plan-critic`, `plan-splitter`, `stage-brief-writer`, `stage-implementer` role definitions |
 | `hooks/stage-gate.py` | `TaskCompleted` hook: a stage closes only with a LOG entry, its commit, and only owned paths touched |
 | `examples/pipeline.json` | Per-project smoke/live restart commands (`.claude/pipeline.json`) |
 | `examples/settings.hooks.json` | The hook registration for `~/.claude/settings.json` |
